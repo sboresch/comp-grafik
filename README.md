@@ -29,12 +29,13 @@ If I push fixes or additions, get them with:
 
 ```
 cd ~/work/comp-grafik
+python3 nbclean.py clean-all .
 git add -A
 git pull
 ```
 
-The `git add -A` matters, not just `git pull` on its own. Just *opening* a
-notebook can make Jupyter silently rewrite parts of it (which exact kernel
+The middle two lines matter, not just `git pull` on its own. Just *opening*
+a notebook can make Jupyter silently rewrite parts of it (which exact kernel
 version ran it, leftover "last run" markers) even if you never typed
 anything -- and that alone is enough for a plain `git pull` to refuse with:
 
@@ -42,28 +43,18 @@ anything -- and that alone is enough for a plain `git pull` to refuse with:
 error: Your local changes to the following files would be overwritten by merge
 ```
 
-`git add -A` passes every notebook through a filter (set up once, below)
-that ignores exactly that kind of noise, so the only "local changes" left
-afterward are things you actually typed -- and then `git pull` goes through
-cleanly.
+`nbclean.py clean-all .` (committed in this repository, nothing to install)
+rewrites every notebook in place, stripping exactly that kind of
+kernel-generated noise -- never touching anything you actually typed into a
+notebook, e.g. answers to embedded questions. If that was the only
+difference, `git add -A` then finds nothing to stage and `git pull` goes
+through cleanly. (No one-time setup needed, and nothing to configure that
+would need to survive a session restart -- just these commands, every time.)
 
-**Do this once, right after cloning**, to set up that filter:
-
-```
-cd ~/work/comp-grafik
-git config filter.nbclean.clean "python3 nbclean.py clean"
-git config filter.nbclean.smudge cat
-```
-
-(This only changes how git *compares* notebooks internally -- it never
-touches the files themselves, and it won't hide anything you actually typed
-into a notebook, e.g. answers to embedded questions. Only kernel-generated
-noise is ignored.)
-
-**If `git pull` still refuses even after `git add -A`:** that means you
-really have typed something into that notebook that the update would
-otherwise overwrite. If you want to keep it, copy that notebook somewhere
-outside this folder first. Then:
+**If `git pull` still refuses even after this:** that means you really have
+typed something into that notebook that the update would otherwise
+overwrite. If you want to keep it, copy that notebook somewhere outside this
+folder first. Then:
 
 ```
 git checkout -- <path/to/the/file.ipynb>
