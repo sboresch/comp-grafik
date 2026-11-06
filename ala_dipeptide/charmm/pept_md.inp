@@ -1,0 +1,47 @@
+* CONSTRUCTION OF A PHI-PSI MAP FOR BLOCKED @aa
+* |
+* using all-atom CHARMM@{FF} force field
+* attempting to be cleverer at minimization // use always c36 ICs
+*
+
+strea ./charmm/setup_ff.str
+
+iofo exte
+
+read psf  card  name ./psfcoor/@{aa}.charmm@{ff}.psf
+read coor card  name ./psfcoor/@{aa}_init.charmm@{ff}.crd
+read ic   card  name ./psfcoor/@{aa}.charmm36.ic
+
+! setup energy and nonbonded options -- we include all interactions in this
+! computation (since nonbond list is complete, can use inbfrq 0 later on)
+
+energy ctofnb 990. ctonnb 980. cutnb 1000.
+
+
+!  Run Langevin MD
+!  Do it in two steps, (i) equilibration, followed (ii) by production
+
+! set friction coefficient
+scalar fbeta set 5 sele all end
+set neq 500000
+set nprod 5000000
+if @?extend .eq. 0 set extend 1
+calc nprod = @nprod * @extend
+
+! (i) equilibration
+open writ form unit 10 name data/equil.@aa.@ff.rst
+dyna lang start nstep @neq -
+     firstt 240 finalt 300 tbath 300 ilbfrq 0 -
+     iunwri 10 -
+     nprint 10000 iprfrq 100000
+
+! (ii) production
+open read form unit 10 name data/equil.@aa.@ff.rst
+open writ form unit 11 name data/prod.@aa.@ff.1.rst
+open writ file unit 12 name data/prod.@aa.@ff.1.dcd
+dyna lang restart nstep @nprod -
+     firstt 240 finalt 300 tbath 300 ilbfrq 0 -
+     iunrea 10 iunwri 11 iuncrd 12 nsavc 10000 -
+     nprint 100000 iprfrq 1000000
+
+stop

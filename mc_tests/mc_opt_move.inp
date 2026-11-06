@@ -1,0 +1,94 @@
+* MC of a tetrapeptide
+* based on charmm mc testcase
+* Dec 2020, SB, adapt for charmm course
+* adapt / optimize MC moves
+*
+
+! Read topology and parameter files
+stream toppar.str
+
+read psf card name data/rgds.psf
+read coor card name data/rgds_start.crd
+
+! Infinite cutoff for testing
+
+NBONDS  ATOM  switch CDIE  VDW VSwitch  -
+        CUTNB 200.0 CTOFNB 18.0 CTONNB 16.0  WMIN 1.5  EPS 1.0
+
+ENERgy
+
+! Create the desired MC move type
+
+! Single atom moves for the peptide atoms
+MOVE ADD MVTP CART WEIGht 1.0 DMAX 0.05 -
+        ARMP 0.40 ARMA 0.4 ARMB 0.4 DOMCf 3.0 ANISotropic 1 LABEL SING -
+        SELE (.NOT. RESNAME TIP3) END
+
+! Individual rotation of the peptide side chain torsions
+MOVE ADD MVTP TORS WEIGht  1.0 DMAX  70.0 FEWEr 1 LABEL SIDE -
+         ARMP 0.20 ARMA 0.4 ARMB 0.4 DOMCf 5.0 -
+         SELE (.NOT.(TYPE C .OR. TYPE N))  END  -
+         SELE (.NOT.(TYPE C .OR. TYPE N))  END  
+
+! Individual rotation of the peptide psi torsions
+MOVE ADD MVTP TORS WEIGht    1.0 DMAX  15.0 FEWEr 1 LABEL PSI -
+         ARMP 0.20 ARMA 0.4 ARMB 0.4 DOMCf 5.0 -
+         SELE (TYPE C) END SELE (TYPE CA) END  
+
+! Individual rotation of the peptide phi torsions
+MOVE ADD MVTP TORS WEIGht    1.0 DMAX  15.0 FEWEr 1 LABEL PHI -
+         ARMP 0.20 ARMA 0.4 ARMB 0.4 DOMCf 5.0 -
+         SELE (TYPE N) END SELE (TYPE CA) END  
+
+! Individual rotation of the peptide bonds
+MOVE ADD MVTP TORS WEIGht    1.0 DMAX  15.0 FEWEr 1 LABEL OMEG -
+         ARMP 0.20 ARMA 0.4 ARMB 0.4 DOMCf 5.0 -
+         SELE (TYPE N) END SELE (TYPE C) END  
+
+! Concerted rotation of the main chain with rigid peptide bonds
+!
+! The first selection is the polymer "backbone" and the following
+! pairs of selections are the rigid bonds (degrees of freedom).
+!
+! Disulfides cannot be rotated freely and are eliminated from the "backbone".
+! Proline phi dihedrals must be treated as rigid.
+!
+! ARMP < 0 and DOMCf < 0 (defaults) suppress automatic optimization for 
+! these moves.
+
+MOVE ADD MVTP CROT WEIGht  1.0 DMAX  5.0 NLIMit 5 LABEL CRT1 - 
+         ARMP -1.0 DOMCf -1.0 -
+         SELE ((TYPE N .OR. TYPE CA .OR. TYPE C) .AND. .NOT. (RESNAME CYS)) END -
+         SELE (TYPE C) END SELE (TYPE N) END -
+         SELE (RESNAME PRO .AND. TYPE CA) END -
+         SELE (RESNAME PRO .AND. TYPE  N) END 
+
+! Concerted rotation of the main chain with flexible peptide bonds
+MOVE ADD MVTP CROT WEIGht  1.0 DMAX  5.0 NLIMIT 5 LABEL CRT2 - 
+         ARMP -1.0 DOMCf -1.0 -
+         SELE ((TYPE N .OR. TYPE CA .OR. TYPE C) .AND. .NOT. (RESNAME CYS)) END -
+         SELE (RESNAME PRO .AND. TYPE CA) END -
+         SELE (RESNAME PRO .AND. TYPE  N) END 
+
+OPEN WRITE CARD UNIT 35 NAME data/init.mcm
+MOVE WRITE UNIT 35
+
+! Open a file for trajectory writing
+
+OPEN WRITE UNFORMATTED UNIT 34 NAME data/mc_opt_move.dcd
+
+! Run a short Monte Carlo simulation with the above move set, optimize
+! moves and save the optimized moves
+!
+! Numerical errors in the loop closure algorithm for the concerted
+! rotations introduce change the angles slightly, resulting in small
+! errors in the total energy (Delta-E values of order 0.0001).
+
+MC TEMPerature 300.00   NSTEps 200000 ISEEd 1 2 3 4 -
+   IDOMcfrq  5 INBFrq 0 IECHeck 1000 IUNCrd 34 NSAVc 1000
+
+OPEN WRITE CARD UNIT 36 NAME data/opt.mcm
+move wRITE UNIT 36
+
+STOP
+

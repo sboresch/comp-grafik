@@ -1,0 +1,40 @@
+* CONSTRUCTION OF A PHI-PSI MAP FOR BLOCKED @aa
+* |
+* using all-atom CHARMM@{FF} force field
+* attempting to be cleverer at minimization // use always c36 ICs
+*
+
+strea ./charmm/setup_ff.str
+
+iofo exte
+
+read psf  card  name ./psfcoor/@{aa}.charmm@{ff}.psf
+read coor card  name ./psfcoor/@{aa}_init.charmm@{ff}.crd
+read ic   card  name ./psfcoor/@{aa}.charmm36.ic
+
+! setup energy and nonbonded options -- we include all interactions in this
+! computation (since nonbond list is complete, can use inbfrq 0 later on)
+
+energy ctofnb 990. ctonnb 980. cutnb 1000.
+
+set name prod.@aa.@ff
+set outname md
+if @?mc .eq. 1 set name mc.@aa.@ff
+if @?mc .eq. 1 set outname mc
+
+open read file unit 12 name ./data/@name.1.dcd
+open writ form unit 30 name ./data/phi_psi_@{outname}.@aa_@ff.dat
+
+traj query unit 12
+set sval ?skip
+if @?skip .eq. 0 set skip 1
+calc sval = ?skip * @skip
+
+correl maxseries 2 maxtime ?nfile maxa 10 
+enter phi dihe 1 cy 1 n  1 ca 1 c  
+enter psi dihe 1  n 1 ca 1  c 1 nt 
+traj firstu 12 nunit 1 skip @sval
+writ all dumb time unit 30
+end
+
+stop

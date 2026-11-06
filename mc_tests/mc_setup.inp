@@ -1,0 +1,45 @@
+* MC of a tetrapeptide
+* based on charmm mc testcase
+* Dec 2020, SB, adapt for charmm course
+*
+
+! this script just sets up psf and starting coordinates; base
+! for the actual MC tests
+
+! Read topology and parameter files
+stream toppar.str
+
+READ SEQUENCE CARD
+* RGDS
+*
+4
+ARG GLY ASP SER
+GENERATE MAIN FIRST NTER LAST CTER SETUP
+
+OPEN writ CARD UNIT 21 NAME data/rgds.psf
+writ psf card UNIT 21
+* psf of test peptide for visualization
+*
+
+IC PARAM
+IC SEED MAIN 2 N MAIN 2 CA MAIN 2 C
+IC BUILD
+
+OPEN writ CARD UNIT 21 NAME data/rgds_start.crd
+writ coor card UNIT 21
+* initial coors of test peptide
+*
+
+OPEN writ CARD UNIT 21 NAME data/rgds_start.pdb
+writ coor pdb UNIT 21
+* initial coors of test peptide
+*
+
+! Infinite cutoff for testing
+
+NBONDS  ATOM  switch CDIE  VDW VSwitch  -
+        CUTNB 200.0 CTOFNB 18.0 CTONNB 16.0  WMIN 1.5  EPS 1.0
+
+ENERgy
+
+stop

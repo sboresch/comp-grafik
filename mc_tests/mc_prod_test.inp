@@ -1,0 +1,44 @@
+* MC of a tetrapeptide
+* based on charmm mc testcase
+* Dec 2020, SB, adapt for charmm course
+* run MC, either with basic or optimized set
+*
+
+! Read topology and parameter files
+stream toppar.str
+
+read psf card name data/rgds.psf
+read coor card name data/rgds_start.crd
+
+! Infinite cutoff for testing
+
+NBONDS  ATOM  switch CDIE  VDW VSwitch  -
+        CUTNB 200.0 CTOFNB 18.0 CTONNB 16.0  WMIN 1.5  EPS 1.0
+
+ENERgy
+
+if @?opt .eq. 0 then
+OPEN read CARD UNIT 35 NAME data/init.mcm
+else
+OPEN read CARD UNIT 35 NAME data/opt.mcm
+endif
+MOVE read UNIT 35
+
+! Open a file for trajectory writing
+
+set x unopt
+if @?opt .ne. 0 set x opt
+OPEN WRITE UNFORMATTED UNIT 34 NAME data/mc_prod.@x.dcd
+
+! Run a short Monte Carlo simulation with the above move set, optimize
+! moves and save the optimized moves
+!
+! Numerical errors in the loop closure algorithm for the concerted
+! rotations introduce change the angles slightly, resulting in small
+! errors in the total energy (Delta-E values of order 0.0001).
+
+MC TEMPerature 300.00   NSTEps 1000000 ISEEd 1 2 3 4 -
+   IDOMcfrq  5 INBFrq 0 IECHeck 1000 IUNCrd 34 NSAVc 1000
+
+STOP
+

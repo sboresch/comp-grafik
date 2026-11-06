@@ -1,0 +1,21 @@
+* read rtf/params and build a blocked tryp
+* ignore details
+*
+
+prnlev 0
+
+stream toppar.str
+
+read sequ card
+* blocked trp
+*
+1
+trp
+
+gene tryp first aced last ct3 setup 
+
+ic para
+ic seed tryp 1 n tryp 1 ca tryp 1 c
+ic build
+
+prnlev 5

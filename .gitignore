@@ -1,0 +1,7 @@
+# Jupyter / editor / OS cruft that has shown up in this material before
+.ipynb_checkpoints/
+.*.sage-jupyter2
+.stamp
+.DS_Store
+._*
+*~

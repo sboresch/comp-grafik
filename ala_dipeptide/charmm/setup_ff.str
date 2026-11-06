@@ -1,0 +1,9 @@
+* choose force field according to @ff
+*
+
+set fftype 22
+if @ff .eq. 36 set fftype 36
+read rtf  card name ./toppar/top_all@{fftype}_prot.rtf
+read para card name ./toppar/par_all@{fftype}_prot.prm
+
+if @ff .eq. 22 skip cmap

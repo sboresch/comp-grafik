@@ -1,0 +1,150 @@
+* CONSTRUCTION OF A PHI-PSI MAP FOR BLOCKED @aa
+* |
+* using all-atom CHARMM@{FF} force field
+* attempting to be cleverer at minimization // use always c36 ICs
+*
+
+strea ./charmm/setup_ff.str
+
+iofo exte
+
+read psf  card  name ./psfcoor/@{aa}.charmm@{ff}.psf
+read coor card  name ./psfcoor/@{aa}_init.charmm@{ff}.crd
+read ic   card  name ./psfcoor/@{aa}.charmm36.ic
+
+! setup energy and nonbonded options -- we include all interactions in this
+! computation (since nonbond list is complete, can use inbfrq 0 later on)
+
+energy ctofnb 990. ctonnb 980. cutnb 1000.
+
+! loop to calculate the phi psi plot. In each cycle of the loop, the dihedrals
+! are constrained to a new set of angles and the structure obtained from
+! the previous set is reminimized.
+
+! The data are written in such a manner that gnuplot
+! can construct the contour-plot correctly (i.e. don't change the logic
+! of the loops).
+
+open write card unit 15 name ./data/@{aa}.charmm@{ff}.pot
+echu 15
+
+set phi -180.0
+set psi -180.0
+set inc   15.0
+
+labe loop
+
+! rebuild coors with new phi/psi angle
+coor init sele all end
+ic edit
+dihe 1 cy 1 n  1 ca 1 c  @phi
+dihe 1  n 1 ca 1  c 1 nt @psi
+end
+ic para
+ic seed 1 N  1 CA  1 C
+ic build
+
+! place constraints
+cons dihe @{aa} 1 cy @{aa} 1 n  @{aa} 1 ca @{aa} 1 c  forc 20000. min @phi
+cons dihe @{aa} 1 n  @{aa} 1 ca @{aa} 1 c  @{aa} 1 nt forc 20000. min @psi
+
+mini sd   nste   100 npri 100 inbfrq 0 ihbfrq 0 
+mini abnr nste 10000 npri 100 inbfrq 0 ihbfrq 0 
+mini nrap nste   200 npri  20 inbfrq 0 ihbfrq 0 
+
+format (f13.6)
+echo @phi @psi ?ener
+format
+
+cons cldh ! now remove the constraints again
+
+! now increment the phi value by  degrees
+
+calc psi = @psi+@inc
+if psi le 170. goto loop
+
+! end of row; reset psi, increment phi by 15 degr., insert blank line in
+! plot file (for gnuplot)
+
+echo 
+
+set psi -180
+calc phi = @phi+@inc
+if phi le 170. goto loop
+
+stop
+* CONSTRUCTION OF A PHI-PSI MAP FOR BLOCKED @aa
+* |
+* using all-atom CHARMM@{FF} force field
+* attempting to be cleverer at minimization // use always c36 ICs
+*
+
+strea ./charmm/setup_ff.str
+
+iofo exte
+
+read psf  card  name ./psfcoor/@{aa}.charmm@{ff}.psf
+read coor card  name ./psfcoor/@{aa}_init.charmm@{ff}.crd
+read ic   card  name ./psfcoor/@{aa}.charmm36.ic
+
+! setup energy and nonbonded options -- we include all interactions in this
+! computation (since nonbond list is complete, can use inbfrq 0 later on)
+
+energy ctofnb 990. ctonnb 980. cutnb 1000.
+
+! loop to calculate the phi psi plot. In each cycle of the loop, the dihedrals
+! are constrained to a new set of angles and the structure obtained from
+! the previous set is reminimized.
+
+! The data are written in such a manner that gnuplot
+! can construct the contour-plot correctly (i.e. don't change the logic
+! of the loops).
+
+open write card unit 15 name ./data/@{aa}.charmm@{ff}.pot
+echu 15
+
+set phi -180.0
+set psi -180.0
+set inc   15.0
+
+labe loop
+
+! rebuild coors with new phi/psi angle
+coor init sele all end
+ic edit
+dihe 1 cy 1 n  1 ca 1 c  @phi
+dihe 1  n 1 ca 1  c 1 nt @psi
+end
+ic para
+ic seed 1 N  1 CA  1 C
+ic build
+
+! place constraints
+cons dihe @{aa} 1 cy @{aa} 1 n  @{aa} 1 ca @{aa} 1 c  forc 20000. min @phi
+cons dihe @{aa} 1 n  @{aa} 1 ca @{aa} 1 c  @{aa} 1 nt forc 20000. min @psi
+
+mini sd   nste   100 npri 100 inbfrq 0 ihbfrq 0 
+mini abnr nste 10000 npri 100 inbfrq 0 ihbfrq 0 
+mini nrap nste   200 npri  20 inbfrq 0 ihbfrq 0 
+
+format (f13.6)
+echo @phi @psi ?ener
+format
+
+cons cldh ! now remove the constraints again
+
+! now increment the phi value by  degrees
+
+calc psi = @psi+@inc
+if psi le 170. goto loop
+
+! end of row; reset psi, increment phi by 15 degr., insert blank line in
+! plot file (for gnuplot)
+
+echo 
+
+set psi -180
+calc phi = @phi+@inc
+if phi le 170. goto loop
+
+stop

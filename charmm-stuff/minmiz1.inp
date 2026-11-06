@@ -1,0 +1,48 @@
+* MINIMIZATION
+* Uebungen zu Computergrafik und Computersimulation von Biomolekuelen
+* Wintersemester 2011/12, Universitaet Wien, Stefan Boresch
+*
+
+! setup the system (a blocked tryptophane)
+
+stream minmiz_setup.str
+
+! in order to allow visualization, let's write a psf/pdb
+
+open unit 11 form writ name psf_coor/trp.psf
+writ psf card unit 11
+* blocked trp used in minmiz1.inp
+*
+
+open unit 11 form writ name psf_coor/trp_init.pdb
+writ coor pdb card unit 11
+* blocked trp used in minmiz1.inp, starting coors
+*
+
+! Energy of initial coordinates; use to set a huge list radius
+
+energy cutnb 100. ihbfrq 0
+
+! Save a copy of starting coors so that we can compute a RMS deviation
+coor copy comp ! ignore details
+
+! minimize
+! As written use steepest descent (SD). Try out
+! the other methods (at least one from {CONJ, ABNR, POWE}, also
+! try NRAP). We do not work with the truncated Newton method (TN)
+
+mini   sd nstep  100 inbfrq 0   nprint  1
+!mini conj nstep  100 inbfrq 0   nprint  1
+!mini powe nstep  100 inbfrq 0   nprint  1
+!mini abnr nstep  100 inbfrq 0   nprint  1
+!mini nrap nstep  100 inbfrq 0   nprint  1
+
+coor orie rms sele all end                  ! all atoms
+coor orie rms sele .not. hydrogen end       ! heavy atoms only
+
+open unit 11 form writ name psf_coor/trp_minimized.pdb
+writ coor pdb card unit 11
+* blocked trp used in minmiz1.inp, after minimization
+*
+
+stop

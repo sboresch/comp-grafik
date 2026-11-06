@@ -1,0 +1,62 @@
+* A basic CHARMM script
+* Nov 2011, Universitaet Wien, Stefan Boresch
+* |
+* Default nonbonded options are used. Should you use this file as
+* the basis for real work, please check whether these settings are appropriate
+*
+
+! Many CHARMM scripts follow the same basic pattern 
+!     (which you'll see over and over again)
+! (A) Read generic files for class of molecules studied (RTF/PRM)
+!        here we read a so-called 'stream' file which does all the work
+! (B) Read specifics of system (PSF/CRD)
+!    --- now we are ready to do something ---
+! (C) Set various parameters/options (e.g., nonbonded cutoff radius, 
+!     use of periodic boundary conditions, use of SHAKE
+! (D) Calculate energy, minimize, run MC or MD
+! (E) Optional: Do some (quick and dirty) analysis what happened in (D)
+! (F) Save new coordinates (plus other information should it have changed)
+!
+
+! Read RTF and parameter files (A)
+
+stream toppar.str ! does all the work
+
+! Read PSF and coordinate file (B)
+
+read psf card name psf_coor/1crn.psf
+
+read coor card name psf_coor/1crn_init.crd
+
+! Step (C) omitted 
+
+! Calculate the energy (D) 
+
+energy ! here you could finetune the energy options
+
+! Minimize: 100 steps steepest descent (SD), 100 steps adopted basis set 
+!      Newton Raphson (ABNR)
+
+mini sd nstep 100
+mini abnr nstep 100
+
+! Step (E) omitted.
+
+! Save new coordinates in pdb and crd format (F)
+
+writ coor card name psf_coor/1crn_somemini.crd
+* CRAMBIN, from pdb entry 1crn,
+* with CHARMM27 parameter set
+* after 100 steps SD + 100 steps ABNR minimization
+*
+
+! write coordinates also in pdb format
+! important to (re)import structures into externan (graphics) programs 
+! that don't understand CHARMM format
+writ coor pdb name psf_coor/1crn_somemini.pdb
+* CRAMBIN, from pdb entry 1crn,
+* with CHARMM27 parameter set
+* after 100 steps SD + 100 steps ABNR minimization
+*
+
+stop

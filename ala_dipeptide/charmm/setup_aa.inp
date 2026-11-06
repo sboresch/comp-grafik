@@ -1,0 +1,50 @@
+* setup for blocked amino acid @aa
+* force field must be specied: @ff can be 22, 27 or 36
+* |
+* SB, Jan 2014
+* SB, Jan 2015
+*
+
+strea ./charmm/setup_ff.str
+
+iofo exte
+
+read sequ card
+* build solu = @aa
+*
+1
+@aa
+
+gene @aa first ACED last CT3 setup
+
+ic para
+ic seed 1 N  1 CA  1 C
+ic build
+
+coor orie mass sele all end
+
+energy
+
+writ coor card name ./psfcoor/@{aa}_init.charmm@{ff}.crd
+* coors for solu @{aa} built from ICs
+* ff = charmm@{ff}
+*
+
+writ coor pdb  name ./psfcoor/@{aa}_init.charmm@{ff}.pdb
+* coors for solu @{aa} built from ICs
+*
+
+writ psf card  name ./psfcoor/@{aa}.charmm@{ff}.psf
+* solu @{aa} 
+* ff = charmm@{ff}
+*
+
+writ ic  card  name ./psfcoor/@{aa}.charmm@{ff}.ic
+* ICs solu @{aa}
+* ff = charmm@{ff}
+*
+
+define heavy sele .not. hydrogen end
+echo ?nsel heavy atoms
+
+stop
