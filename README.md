@@ -66,14 +66,21 @@ and re-apply whatever you'd saved by comparing it against the updated file.
 **If it keeps refusing even after that** (this has happened at least once,
 for reasons that weren't fully pinned down -- possibly something re-touching
 the file in the background, possibly leftover state from an earlier failed
-pull attempt): skip the troubleshooting and just get a fresh copy. As long
-as you haven't made any changes here you need to keep:
+pull attempt): don't delete anything -- move your whole current copy aside
+instead, so nothing is lost (answers you've typed into *any* notebook in
+this folder, not just the one causing trouble, are all still sitting safely
+in the renamed copy), and get a fresh clone next to it:
 
 ```
 cd ~/work
-rm -rf comp-grafik
+mv comp-grafik comp-grafik-old
 git clone https://github.com/sboresch/comp-grafik.git
 ```
+
+Your previous copy is now at `~/work/comp-grafik-old/`, completely intact. Open
+it, find anything you need (answers you typed, your own files), and copy
+that over into the matching file in the fresh `~/work/comp-grafik/` -- then you
+can delete `comp-grafik-old` once you're sure you got everything.
 
 
 ## Course structure
