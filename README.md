@@ -63,6 +63,18 @@ git pull
 
 and re-apply whatever you'd saved by comparing it against the updated file.
 
+**If it keeps refusing even after that** (this has happened at least once,
+for reasons that weren't fully pinned down -- possibly something re-touching
+the file in the background, possibly leftover state from an earlier failed
+pull attempt): skip the troubleshooting and just get a fresh copy. As long
+as you haven't made any changes here you need to keep:
+
+```
+cd ~/work
+rm -rf comp-grafik
+git clone https://github.com/sboresch/comp-grafik.git
+```
+
 
 ## Course structure
 
