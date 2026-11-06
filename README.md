@@ -25,17 +25,29 @@ given inside the notebooks assume the repository was cloned there.
 
 ## Getting updates later in the semester
 
-If I push fixes or additions, get them with a plain `git pull` from inside
-`~/work/comp-grafik`. There's one wrinkle: just *opening* a notebook can make
-Jupyter silently rewrite parts of it (which exact kernel version ran it,
-leftover "last run" output) even if you never typed anything -- and that's
-enough for git to refuse the pull with something like:
+If I push fixes or additions, get them with:
+
+```
+cd ~/work/comp-grafik
+git add -A
+git pull
+```
+
+The `git add -A` matters, not just `git pull` on its own. Just *opening* a
+notebook can make Jupyter silently rewrite parts of it (which exact kernel
+version ran it, leftover "last run" markers) even if you never typed
+anything -- and that alone is enough for a plain `git pull` to refuse with:
 
 ```
 error: Your local changes to the following files would be overwritten by merge
 ```
 
-**Do this once, right after cloning**, to make git ignore that kind of noise:
+`git add -A` passes every notebook through a filter (set up once, below)
+that ignores exactly that kind of noise, so the only "local changes" left
+afterward are things you actually typed -- and then `git pull` goes through
+cleanly.
+
+**Do this once, right after cloning**, to set up that filter:
 
 ```
 cd ~/work/comp-grafik
@@ -48,16 +60,18 @@ touches the files themselves, and it won't hide anything you actually typed
 into a notebook, e.g. answers to embedded questions. Only kernel-generated
 noise is ignored.)
 
-**If you still hit the error anyway** (e.g. you skipped the step above), and
-you're sure the local copy of that one file has nothing you want to keep:
+**If `git pull` still refuses even after `git add -A`:** that means you
+really have typed something into that notebook that the update would
+otherwise overwrite. If you want to keep it, copy that notebook somewhere
+outside this folder first. Then:
 
 ```
 git checkout -- <path/to/the/file.ipynb>
 git pull
 ```
 
-If you *have* typed something into that file you want to keep, copy it
-somewhere outside the repository first, then run the above.
+and re-apply whatever you'd saved by comparing it against the updated file.
+
 
 ## Course structure
 
