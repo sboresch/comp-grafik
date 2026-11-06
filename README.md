@@ -10,6 +10,10 @@ course's JupyterHub server.
 
 ## Getting started (on the course JupyterHub)
 
+**If you're a University of Vienna student enrolled in this course:** use the link provided on the course's Moodle page instead of the instructions below -- it handles both the initial setup and later updates automatically, with no git commands needed at all.
+
+The instructions below are for anyone else who wants to get this material directly from GitHub.
+
 Open a terminal in JupyterHub and run:
 
 ```
