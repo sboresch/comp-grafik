@@ -66,3 +66,7 @@ The remaining four can be done in whatever order suits you:
 Each folder's own notebook has the detailed instructions and the exact TODO
 list for that task. (Deadlines and upload instructions for a given course run
 are posted on Moodle, not here.)
+
+## License
+
+This material is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) (Attribution-NonCommercial-ShareAlike) -- see [LICENSE](LICENSE). In short: share and adapt freely with credit, not for commercial use, and release any adaptations under the same license.
