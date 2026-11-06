@@ -23,6 +23,42 @@ download.
 This creates `~/work/comp-grafik/`, containing the folders below. All paths
 given inside the notebooks assume the repository was cloned there.
 
+## Getting updates later in the semester
+
+If I push fixes or additions, get them with a plain `git pull` from inside
+`~/work/comp-grafik`. There's one wrinkle: just *opening* a notebook can make
+Jupyter silently rewrite parts of it (which exact kernel version ran it,
+leftover "last run" output) even if you never typed anything -- and that's
+enough for git to refuse the pull with something like:
+
+```
+error: Your local changes to the following files would be overwritten by merge
+```
+
+**Do this once, right after cloning**, to make git ignore that kind of noise:
+
+```
+cd ~/work/comp-grafik
+git config filter.nbclean.clean "python3 nbclean.py clean"
+git config filter.nbclean.smudge cat
+```
+
+(This only changes how git *compares* notebooks internally -- it never
+touches the files themselves, and it won't hide anything you actually typed
+into a notebook, e.g. answers to embedded questions. Only kernel-generated
+noise is ignored.)
+
+**If you still hit the error anyway** (e.g. you skipped the step above), and
+you're sure the local copy of that one file has nothing you want to keep:
+
+```
+git checkout -- <path/to/the/file.ipynb>
+git pull
+```
+
+If you *have* typed something into that file you want to keep, copy it
+somewhere outside the repository first, then run the above.
+
 ## Course structure
 
 ### Part 1 — VMD (mostly on your own computer)
